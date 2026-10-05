@@ -5,89 +5,243 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>StudyStreak</title>
 <style>
-  body { font-family: system-ui, sans-serif; max-width: 760px; margin: 2rem auto; padding: 0 1rem; color: #1b1b1b; }
-  h1 { margin-bottom: .25rem; }
-  .cards { display: flex; gap: 1rem; margin: 1rem 0; flex-wrap: wrap; }
-  .card { flex: 1; min-width: 150px; border: 1px solid #ccc; border-radius: 8px; padding: .75rem 1rem; }
-  .card strong { display: block; font-size: 1.6rem; }
-  form { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: .5rem; align-items: end; }
+  :root {
+    --bg: #0f1117;
+    --surface: #181b24;
+    --surface-2: #1f2330;
+    --border: #2a2f3d;
+    --text: #e8eaf0;
+    --muted: #9aa3b5;
+    --accent: #7c5cff;
+    --accent-2: #9d7bff;
+    --accent-soft: rgba(124, 92, 255, 0.15);
+    --danger: #ff5470;
+    --success: #39d98a;
+    --focus: #ffc83d;
+    --radius: 14px;
+    --shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+  }
+  @media (prefers-color-scheme: light) {
+    :root {
+      --bg: #f4f5fb;
+      --surface: #ffffff;
+      --surface-2: #f0f1f8;
+      --border: #e2e4f0;
+      --text: #1b1e2b;
+      --muted: #5e6578;
+      --accent-soft: rgba(124, 92, 255, 0.12);
+      --shadow: 0 8px 30px rgba(70, 60, 130, 0.12);
+    }
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    background:
+      radial-gradient(1100px 500px at 85% -10%, var(--accent-soft), transparent 60%),
+      var(--bg);
+    color: var(--text);
+    margin: 0;
+    padding: 2.5rem 1rem 4rem;
+    line-height: 1.5;
+  }
+  main { max-width: 920px; margin: 0 auto; }
+
+  header.hero { margin-bottom: 2rem; }
+  .brand { display: flex; align-items: center; gap: .75rem; }
+  .logo {
+    width: 44px; height: 44px; border-radius: 12px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    display: grid; place-items: center; font-size: 1.4rem;
+    box-shadow: var(--shadow);
+  }
+  h1 { margin: 0; font-size: 1.9rem; letter-spacing: -0.5px; }
+  .tagline { color: var(--muted); margin: .35rem 0 0; }
+
+  h2 {
+    font-size: 1.05rem; text-transform: uppercase; letter-spacing: 1px;
+    color: var(--muted); margin: 2.25rem 0 .9rem; font-weight: 600;
+  }
+
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.4rem 1.5rem;
+    box-shadow: var(--shadow);
+  }
+
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.1rem 1.2rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .card::before {
+    content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
+    background: linear-gradient(var(--accent), var(--accent-2));
+  }
+  .card .label { color: var(--muted); font-size: .82rem; text-transform: uppercase; letter-spacing: .6px; }
+  .card strong { display: block; font-size: 2.1rem; font-weight: 700; line-height: 1.1; margin: .25rem 0; }
+  .card .unit { color: var(--muted); font-size: .85rem; }
+
+  form { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: .8rem; align-items: end; }
   form .wide { grid-column: 1 / 3; }
-  label { display: flex; flex-direction: column; font-size: .9rem; gap: .2rem; }
-  input, button { font: inherit; padding: .45rem; }
-  button { cursor: pointer; background: #5b2dd1; color: #fff; border: 0; border-radius: 6px; }
-  button.del { background: #b00020; padding: .2rem .6rem; }
-  button:focus-visible, input:focus-visible { outline: 3px solid #ffb000; outline-offset: 2px; }
+  label { display: flex; flex-direction: column; font-size: .85rem; gap: .35rem; color: var(--muted); font-weight: 500; }
+  input, select, button {
+    font: inherit;
+    padding: .6rem .7rem;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+    color: var(--text);
+  }
+  select { cursor: pointer; }
+  button {
+    cursor: pointer;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    color: #fff; border: 0; font-weight: 600;
+    transition: transform .08s ease, filter .15s ease;
+  }
+  button:hover { filter: brightness(1.08); }
+  button:active { transform: translateY(1px); }
+  button.secondary { background: var(--surface-2); color: var(--text); border: 1px solid var(--border); }
+  button.del { background: transparent; color: var(--danger); border: 1px solid var(--danger); padding: .3rem .7rem; font-size: .85rem; }
+  button.del:hover { background: var(--danger); color: #fff; }
+  button.edit { background: transparent; color: var(--accent-2); border: 1px solid var(--border); padding: .3rem .7rem; font-size: .85rem; }
+  button.edit:hover { border-color: var(--accent); }
+  button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible {
+    outline: 3px solid var(--focus); outline-offset: 2px;
+  }
+
+  .toolbar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: .75rem; }
+  .toolbar label { flex-direction: row; align-items: center; }
+
   table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
-  th, td { text-align: left; padding: .4rem; border-bottom: 1px solid #ddd; }
-  #msg { min-height: 1.4em; color: #b00020; }
-  .bar { background: #5b2dd1; height: .6rem; border-radius: 3px; }
-  form.goal { grid-template-columns: 2fr 1fr 1fr; margin-top: .5rem; }
-  progress { width: 100%; height: 1rem; accent-color: #5b2dd1; }
+  th, td { text-align: left; padding: .6rem .5rem; border-bottom: 1px solid var(--border); }
+  th { color: var(--muted); font-size: .78rem; text-transform: uppercase; letter-spacing: .6px; font-weight: 600; }
+  tbody tr:hover { background: var(--surface-2); }
+
+  .bar {
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    height: .55rem; border-radius: 99px; min-width: 2px;
+  }
+  .bar-track { background: var(--surface-2); border-radius: 99px; overflow: hidden; }
+
+  progress { width: 100%; height: 1rem; appearance: none; border: 0; border-radius: 99px; overflow: hidden; }
+  progress::-webkit-progress-bar { background: var(--surface-2); border-radius: 99px; }
+  progress::-webkit-progress-value { background: linear-gradient(90deg, var(--accent), var(--accent-2)); border-radius: 99px; }
+  progress::-moz-progress-bar { background: var(--accent); border-radius: 99px; }
+
+  #week-text { color: var(--muted); margin: .25rem 0 .9rem; }
+  #msg { min-height: 1.4em; color: var(--danger); font-weight: 500; margin-top: .8rem; }
+
+  a { color: var(--accent-2); }
+  .csv-link { display: inline-flex; align-items: center; gap: .4rem; }
+
   .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+
+  @media (max-width: 560px) {
+    form { grid-template-columns: 1fr 1fr; }
+    form .wide { grid-column: 1 / 3; }
+  }
 </style>
 </head>
 <body>
 <main>
-  <h1>StudyStreak</h1>
-  <p>Log your study sessions and keep the streak alive.</p>
+  <header class="hero">
+    <div class="brand">
+      <span class="logo" aria-hidden="true">&#128218;</span>
+      <div>
+        <h1>StudyStreak</h1>
+        <p class="tagline">Log your study sessions and keep the streak alive.</p>
+      </div>
+    </div>
+  </header>
 
   <section class="cards" aria-label="Summary">
-    <div class="card"><span>Streak</span><strong id="streak">0</strong>days</div>
-    <div class="card"><span>Longest streak</span><strong id="longest">0</strong>days</div>
-    <div class="card"><span>Total</span><strong id="total">0</strong>minutes</div>
-    <div class="card"><span>Sessions</span><strong id="count">0</strong>logged</div>
+    <div class="card"><span class="label">Streak</span><strong id="streak">0</strong><span class="unit">days</span></div>
+    <div class="card"><span class="label">Longest streak</span><strong id="longest">0</strong><span class="unit">days</span></div>
+    <div class="card"><span class="label">Total</span><strong id="total">0</strong><span class="unit">minutes</span></div>
+    <div class="card"><span class="label">Sessions</span><strong id="count">0</strong><span class="unit">logged</span></div>
   </section>
 
   <h2>This week</h2>
-  <p id="week-text">0 minutes this week (no goal set)</p>
-  <progress id="week-progress" max="100" value="0" aria-labelledby="week-text" hidden></progress>
-  <form id="goal" class="goal">
-    <label>Weekly goal (minutes) <input name="minutes" type="number" min="1" max="10080"></label>
-    <button type="submit">Set goal</button>
-    <button type="button" id="clear-goal">Clear goal</button>
-  </form>
+  <div class="panel">
+    <p id="week-text">0 minutes this week (no goal set)</p>
+    <progress id="week-progress" max="100" value="0" aria-labelledby="week-text" hidden></progress>
+    <form id="goal" class="goal">
+      <label>Weekly goal (minutes) <input name="minutes" type="number" min="1" max="10080"></label>
+      <button type="submit">Set goal</button>
+      <button type="button" id="clear-goal" class="secondary">Clear goal</button>
+    </form>
+  </div>
 
   <h2>Daily activity</h2>
-  <label>Show
-    <select id="range">
-      <option value="7" selected>last 7 days</option>
-      <option value="14">last 14 days</option>
-      <option value="30">last 30 days</option>
-    </select>
-  </label>
-  <table class="daily">
-    <caption class="visually-hidden">Minutes studied per day</caption>
-    <thead><tr><th scope="col">Day</th><th scope="col">Minutes</th><th scope="col" style="width:55%"><span class="visually-hidden">Chart</span></th></tr></thead>
-    <tbody id="daily"></tbody>
-  </table>
+  <div class="panel">
+    <div class="toolbar">
+      <label>Show
+        <select id="range">
+          <option value="7" selected>last 7 days</option>
+          <option value="14">last 14 days</option>
+          <option value="30">last 30 days</option>
+        </select>
+      </label>
+    </div>
+    <table class="daily">
+      <caption class="visually-hidden">Minutes studied per day</caption>
+      <thead><tr><th scope="col">Day</th><th scope="col">Minutes</th><th scope="col" style="width:55%"><span class="visually-hidden">Chart</span></th></tr></thead>
+      <tbody id="daily"></tbody>
+    </table>
+  </div>
 
   <h2>Log a session</h2>
-  <form id="add">
-    <label>Subject <input name="subject" required maxlength="60"></label>
-    <label>Minutes <input name="minutes" type="number" min="1" max="1440" required></label>
-    <label>Date <input name="date" type="date"></label>
-    <label class="wide">Note <input name="note" maxlength="200"></label>
-    <button type="submit" id="add-submit">Add</button>
-    <button type="button" id="cancel-edit" hidden>Cancel edit</button>
-  </form>
-  <p id="msg" role="alert" aria-live="polite"></p>
+  <div class="panel">
+    <form id="add">
+      <label>Subject <input name="subject" required maxlength="60"></label>
+      <label>Minutes <input name="minutes" type="number" min="1" max="1440" required></label>
+      <label>Date <input name="date" type="date"></label>
+      <label class="wide">Note <input name="note" maxlength="200"></label>
+      <button type="submit" id="add-submit">Add</button>
+      <button type="button" id="cancel-edit" class="secondary" hidden>Cancel edit</button>
+    </form>
+    <p id="msg" role="alert" aria-live="polite"></p>
+  </div>
 
   <h2>By subject</h2>
-  <table><thead><tr><th scope="col">Subject</th><th scope="col">Minutes</th><th scope="col" style="width:40%">Share</th></tr></thead>
-    <tbody id="subjects"></tbody></table>
+  <div class="panel">
+    <table><thead><tr><th scope="col">Subject</th><th scope="col">Minutes</th><th scope="col" style="width:40%">Share</th></tr></thead>
+      <tbody id="subjects"></tbody></table>
+  </div>
 
   <h2>Sessions</h2>
-  <p><a href="/api/export.csv" download>Download all sessions as CSV</a></p>
-  <label>Filter by subject
-    <select id="filter"><option value="">All subjects</option></select>
-  </label>
-  <table><thead><tr><th scope="col">Date</th><th scope="col">Subject</th><th scope="col">Minutes</th><th scope="col">Note</th><th scope="col"><span class="visually-hidden">Actions</span></th></tr></thead>
-    <tbody id="sessions"></tbody></table>
+  <div class="panel">
+    <div class="toolbar">
+      <label>Filter by subject
+        <select id="filter"><option value="">All subjects</option></select>
+      </label>
+      <a class="csv-link" href="/api/export.csv" download>&#11015; Download all sessions as CSV</a>
+    </div>
+    <table><thead><tr><th scope="col">Date</th><th scope="col">Subject</th><th scope="col">Minutes</th><th scope="col">Note</th><th scope="col"><span class="visually-hidden">Actions</span></th></tr></thead>
+      <tbody id="sessions"></tbody></table>
+  </div>
 </main>
 <script>
   // All user text is rendered with textContent, never innerHTML.
   const $ = (id) => document.getElementById(id);
   const cell = (row, text) => { const td = document.createElement("td"); td.textContent = text; row.appendChild(td); return td; };
+
+  function barCell(row, pct) {
+    const track = document.createElement("div"); track.className = "bar-track";
+    const bar = document.createElement("div"); bar.className = "bar";
+    bar.style.width = pct + "%";
+    bar.setAttribute("aria-hidden", "true");
+    track.appendChild(bar);
+    cell(row, "").appendChild(track);
+  }
 
   async function api(method, path, body) {
     const res = await fetch(path, { method, headers: { "Content-Type": "application/json" },
@@ -112,10 +266,7 @@
       const label = new Date(d.date + "T00:00").toLocaleDateString(undefined,
                       { weekday: "short", day: "numeric", month: "short" });
       cell(tr, label); cell(tr, d.minutes);
-      const bar = document.createElement("div"); bar.className = "bar";
-      bar.style.width = (100 * d.minutes / peak) + "%";
-      bar.setAttribute("aria-hidden", "true");
-      cell(tr, "").appendChild(bar);
+      barCell(tr, 100 * d.minutes / peak);
       dayBody.appendChild(tr);
     }
 
@@ -128,13 +279,13 @@
     $("total").textContent = stats.total_minutes;
     $("count").textContent = stats.sessions;
 
-    const wk = stats.week, bar = $("week-progress");
+    const wk = stats.week, prog = $("week-progress");
     if (wk.goal) {
       $("week-text").textContent = `${wk.minutes} of ${wk.goal} minutes this week (${wk.percent}%)`;
-      bar.value = wk.percent; bar.hidden = false;
+      prog.value = wk.percent; prog.hidden = false;
     } else {
       $("week-text").textContent = `${wk.minutes} minutes this week (no goal set)`;
-      bar.hidden = true;
+      prog.hidden = true;
     }
 
     const subj = $("subjects"); subj.replaceChildren();
@@ -142,10 +293,7 @@
     for (const e of stats.by_subject) {
       const tr = document.createElement("tr");
       cell(tr, e.subject); cell(tr, e.minutes);
-      const bar = document.createElement("div"); bar.className = "bar";
-      bar.style.width = (100 * e.minutes / max) + "%";
-      bar.setAttribute("aria-hidden", "true");
-      cell(tr, "").appendChild(bar);
+      barCell(tr, 100 * e.minutes / max);
       subj.appendChild(tr);
     }
 
@@ -155,7 +303,7 @@
       cell(tr, s.date); cell(tr, s.subject); cell(tr, s.minutes); cell(tr, s.note);
       const actions = cell(tr, "");
       const edit = document.createElement("button");
-      edit.textContent = "Edit";
+      edit.className = "edit"; edit.textContent = "Edit";
       edit.setAttribute("aria-label", `Edit ${s.subject} on ${s.date}`);
       edit.onclick = () => startEdit(s);
       const btn = document.createElement("button");
